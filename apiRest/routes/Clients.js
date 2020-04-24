@@ -18,7 +18,7 @@ router.route('/clients/:idClient/contracts')
 
 router.route('/clients/:clientId/contracts/:contractId')
     .get(function(req,res){
-      res.send(`Hello from GET client ${req.params.clientId}  contract = ${req.params.contractId}`)
+     res.send(`Hello from GET client ${req.params.clientId}  contract = ${req.params.contractId}`)
     })
     .post(function(req,res){
       res.send(`Hello from POST client ${req.params.clientId} contract = ${req.params.contractId}`)  
