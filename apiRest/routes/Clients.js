@@ -18,30 +18,30 @@ router.route('/clients/:idClient/contracts')
 
 router.route('/clients/:clientId/contracts/:contractId')
     .get(function(req,res){
-      res.send(`Hello from GET client contract =${req.params.contractId}`)
+      res.send(`Hello from GET client ${req.params.clientId}  contract = ${req.params.contractId}`)
     })
     .post(function(req,res){
-      res.send(`Hello from POST client contract =${req.params.contractId}`)  
+      res.send(`Hello from POST client ${req.params.clientId} contract = ${req.params.contractId}`)  
     })
     .put(function(req,res){
-      res.send(`Hello from PUT client contract =${req.params.contractId}`) 
+      res.send(`Hello from PUT client ${req.params.clientId} contract = ${req.params.contractId}`) 
     })
     .delete(function(req,res){
-      res.send(`Hello from DELETE client contract =${req.params.contractId}`) 
+      res.send(`Hello from DELETE client ${req.params.clientId} contract = ${req.params.contractId}`) 
     })
   
 router.route('/clients/:clientId/contracts')
     .get(function(req,res){
-      res.send(`Hello from GET all client contracts =${req.params.clientId}`)
+      res.send(`Hello from GET all client contracts = ${req.params.clientId}`)
     })
     .post(function(req,res){
-      res.send(`Hello from POST all client contracts =${req.params.clientId}`)
+      res.send(`Hello from POST all client contracts = ${req.params.clientId}`)
     })
     .delete(function(req,res){
-      res.send(`Hello from DELETE all client contracts =${req.params.clientId}`)
+      res.send(`Hello from DELETE all client contracts = ${req.params.clientId}`)
     })
     .put(function(req,res){
-      res.send(`Hello from PUT all client contracts =${req.params.clientId}`)
+      res.send(`Hello from PUT all client contracts = ${req.params.clientId}`)
     })
 
     router.route('/clients/:clientId')
