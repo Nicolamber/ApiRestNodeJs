@@ -10,7 +10,7 @@ router.get("/", function (req, res, next) {
 router.route("/clients/:clientId/contracts/:contractId")
   .get(function (req, res) {
     database.hgetall(`contract#${req.body["contractId"]}`, (err, result) => {
-      if (result) {
+      if (!err) {
         res.json({
           status: 200,
           message: "success",
@@ -32,7 +32,7 @@ router.route("/clients/:clientId/contracts/:contractId")
       `contract#${req.body["contractId"]}`,
       req.body,
       (err, result) => {
-        if (result) {
+        if (!err) {
           res.json({
             status: 200,
             message: "success",
@@ -54,7 +54,7 @@ router.route("/clients/:clientId/contracts/:contractId")
       `contract#${req.body["contractId"]}`,
       req.body,
       (err, result) => {
-        if (result) {
+        if (!err) {
           res.json({
             status: 200,
             message: "success",
@@ -73,7 +73,7 @@ router.route("/clients/:clientId/contracts/:contractId")
   .delete(function (req, res) {
     body = JSON.stringify(req.body);
     database.del(req.body["contractId"], (err, result) => {
-      if (result) {
+      if (!err) {
         res.json({
           status: 200,
           message: "success",
