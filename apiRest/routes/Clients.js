@@ -9,8 +9,8 @@ router.get("/", function (req, res, next) {
 });
 router.route("/clients/:clientId/contracts/:contractId")
   .get(function (req, res) {
-    database.hgetall(`contract#${req.body["contractId"]}`, (err, result) => {
-      if (!err) {
+    database.hgetall(`contract#${req.params.contractId}`, (err, result) => {
+      if (result) {
         res.json({
           status: 200,
           message: "success",
@@ -32,7 +32,7 @@ router.route("/clients/:clientId/contracts/:contractId")
       `contract#${req.body["contractId"]}`,
       req.body,
       (err, result) => {
-        if (!err) {
+        if (result) {
           res.json({
             status: 200,
             message: "success",
@@ -54,7 +54,7 @@ router.route("/clients/:clientId/contracts/:contractId")
       `contract#${req.body["contractId"]}`,
       req.body,
       (err, result) => {
-        if (!err) {
+        if (result) {
           res.json({
             status: 200,
             message: "success",
@@ -72,8 +72,9 @@ router.route("/clients/:clientId/contracts/:contractId")
   })
   .delete(function (req, res) {
     body = JSON.stringify(req.body);
-    database.del(req.body["contractId"], (err, result) => {
-      if (!err) {
+    database.del(`contract#${req.body["contractId"]}`,
+    (err, result) => {
+      if (result) {
         res.json({
           status: 200,
           message: "success",
@@ -89,14 +90,25 @@ router.route("/clients/:clientId/contracts/:contractId")
     });
   });
 
-router.route("/clients/:clientId/contracts")
+router.route("/clients/:clientId/contracts") 
   .get(function (req, res) {
-    //res.send(`GET contracts from client with idClient = ${req.params.clientId}`)
-    res.json({
-      status: 200,
-      message: "Hello from GET all contracts of a specific client",
-      user: req.params.clientId,
-      contract: [1, 5, 2, 6, 55], //TODO aca deberia estar la llamada para obtener los contratos por cliente getContracts(id: String): List<Contracts>{}
+    database.hgetall(`client#${req.params.clientId}`, 
+    ["contractId"],
+
+    (err, result) => {
+      if (result) {
+        res.json({
+          status: 200,
+          message: "success",
+          response: result,
+        });
+      } else {
+        res.json({
+          status: 404,
+          message: "Error, file not found",
+          response: {err},
+        });
+      }
     });
   })
   .post(function (req, res) {
@@ -110,24 +122,87 @@ router.route("/clients/:clientId/contracts")
   });
 
 router.route("/clients/:clientId")
-  .get(function (req, res) {
-    //res.send(`Hello from GET a client= ${req.params.clientId}`)
-    res.json({
-      status: 200,
-      message: "Hello from GET a specific client",
-      user: req.params.clientId,
-      contract: req.params.contractId, //TODO igual aca, deberia llamar con este parametro al getClient(id: String): Client{}
-    });
-  })
-  .delete(function (req, res) {
-    //res.send(`Hello from DELETE a client= ${req.params.clientId}`)
-    res.json({
-      status: 200,
-      message: "Hello from DELETE a specific client",
-      user: req.params.clientId,
-      contract: req.params.contractId, //TODO igual aca, deberia llamar con este parametro al deleteClient(id: String): Boolean{}
-    });
+.get(function (req, res) {
+  database.hgetall(`client#${req.params.clientId}`, (err, result) => {
+    if (result) {
+      res.json({
+        status: 200,
+        message: "success",
+        response: result,
+      });
+    } else {
+      res.json({
+        status: 404,
+        message: "Error, file not found",
+        response: {},
+      });
+    }
   });
+})
+
+.post(function (req, res) {
+  body = JSON.stringify(req.body);
+  database.hmset(
+    `client#${req.body["clientId"]}`,
+    req.body,
+    (err, result) => {
+      if (result) {
+        res.json({
+          status: 200,
+          message: "success",
+          response: req.body,
+        });
+      } else {
+        res.json({
+          status: 400,
+          message: "Error during the insert",
+          response: {},
+        });
+      }
+    }
+  );
+})
+.put(function (req, res) {
+  body = JSON.stringify(req.body);
+  database.hmset(
+    `client#${req.body["clientId"]}`,
+    req.body,
+    (err, result) => {
+      if (result) {
+        res.json({
+          status: 200,
+          message: "success",
+          response: req.body,
+        });
+      } else {
+        res.json({
+          status: 401,
+          message: "Error during the update",
+          response: {},
+        });
+      }
+    }
+  );
+})
+.delete(function (req, res) {
+  body = JSON.stringify(req.body);
+  database.del(`client#${req.body["clientId"]}`,
+  (err, result) => {
+    if (result) {
+      res.json({
+        status: 200,
+        message: "success",
+        response: {},
+      });
+    } else {
+      res.json({
+        status: 402,
+        message: "Error during the delete",
+        response: {},
+      });
+    }
+  });
+});
 
 router.route("/clients")
   .get(function (req, res) {
