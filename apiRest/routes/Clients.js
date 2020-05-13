@@ -7,9 +7,12 @@ const database = redis.createClient();
 router.get("/", function (req, res, next) {
   res.render("index", { title: "API REST NICO" });
 });
+
+/*-------------------------------------------------------------------*/
 router.route("/clients/:clientId/contracts/:contractId")
   .get(function (req, res) {
-    database.hgetall(`contract#${req.params.contractId}`, (err, result) => {
+    database.hgetall(`client#${req.params.clientId}contract#${req.params.contractId}`,
+    (err, result) => {
       if (result) {
         res.json({
           status: 200,
@@ -26,29 +29,7 @@ router.route("/clients/:clientId/contracts/:contractId")
     });
   })
 
-  .post(function (req, res) {
-    body = JSON.stringify(req.body);
-    database.hmset(
-      `contract#${req.body["contractId"]}`,
-      req.body,
-      (err, result) => {
-        if (result) {
-          res.json({
-            status: 200,
-            message: "success",
-            response: req.body,
-          });
-        } else {
-          res.json({
-            status: 400,
-            message: "Error during the insert",
-            response: {},
-          });
-        }
-      }
-    );
-  })
-  .put(function (req, res) {
+  /*.put(function (req, res) {
     body = JSON.stringify(req.body);
     database.hmset(
       `contract#${req.body["contractId"]}`,
@@ -69,10 +50,11 @@ router.route("/clients/:clientId/contracts/:contractId")
         }
       }
     );
-  })
+  })*/
+
   .delete(function (req, res) {
     body = JSON.stringify(req.body);
-    database.del(`contract#${req.body["contractId"]}`,
+    database.del(`client#${req.params.clientId}contract#${req.params.contractId}`,
     (err, result) => {
       if (result) {
         res.json({
@@ -89,13 +71,10 @@ router.route("/clients/:clientId/contracts/:contractId")
       }
     });
   });
-
-router.route("/clients/:clientId/contracts") 
+/*-------------------------------------------------------------------*/
+router.route("/clients/:clientId/contracts")
   .get(function (req, res) {
-    database.hgetall(`client#${req.params.clientId}`, 
-    ["contractId"],
-
-    (err, result) => {
+    database.keys(`client#${req.params.clientId}contract#*`, (err, result) => {
       if (result) {
         res.json({
           status: 200,
@@ -111,16 +90,31 @@ router.route("/clients/:clientId/contracts")
       }
     });
   })
-  .post(function (req, res) {
-    //res.send(`POST contract from client with idClient = ${req.params.clientId}`)
-    res.json({
-      status: 200,
-      message: "Hello from POST all contracts of a specific client",
-      user: req.params.clientId,
-      contract: [1, 5, 2, 6, 55], //TODO NOSE SI HACE FALTA UN POST ACA, PREGUNTAR
-    });
-  });
 
+  .post(function (req, res) {
+    body = JSON.stringify(req.body);
+    database.hmset(
+      `client#${req.params.clientId}contract#${req.body["contractId"]}`,
+      req.body, //send in body clientId
+      (err, result) => {
+        if (result) {
+          res.json({
+            status: 200,
+            message: "success",
+            response: req.body,
+          });
+        } else {
+          res.json({
+            status: 400,
+            message: "Error during the insert",
+            response: {},
+          });
+        }
+      }
+    );
+  })
+
+/*-------------------------------------------------------------------*/
 router.route("/clients/:clientId")
 .get(function (req, res) {
   database.hgetall(`client#${req.params.clientId}`, (err, result) => {
@@ -140,6 +134,51 @@ router.route("/clients/:clientId")
   });
 })
 
+/*.put(function (req, res) {
+  body = JSON.stringify(req.body);
+  database.hmset(
+    `client#${req.body["clientId"]}`,
+    req.body,
+    (err, result) => {
+      if (result) {
+        res.json({
+          status: 200,
+          message: "success",
+          response: req.body,
+        });
+      } else {
+        res.json({
+          status: 401,
+          message: "Error during the update",
+          response: {},
+        });
+      }
+    }
+  );
+})*/
+
+.delete(function (req, res) {
+  body = JSON.stringify(req.body);
+  database.del(`client#${req.params.clientId}`,
+  (err, result) => {
+    if (result) {
+      res.json({
+        status: 200,
+        message: "success",
+        response: {},
+      });
+    } else {
+      res.json({
+        status: 402,
+        message: "Error during the delete",
+        response: {},
+      });
+    }
+  });
+});
+
+/*-------------------------------------------------------------------*/
+router.route("/clients")
 .post(function (req, res) {
   body = JSON.stringify(req.body);
   database.hmset(
@@ -162,76 +201,24 @@ router.route("/clients/:clientId")
     }
   );
 })
-.put(function (req, res) {
-  body = JSON.stringify(req.body);
-  database.hmset(
-    `client#${req.body["clientId"]}`,
-    req.body,
-    (err, result) => {
-      if (result) {
-        res.json({
-          status: 200,
-          message: "success",
-          response: req.body,
-        });
-      } else {
-        res.json({
-          status: 401,
-          message: "Error during the update",
-          response: {},
-        });
-      }
-    }
-  );
-})
-.delete(function (req, res) {
-  body = JSON.stringify(req.body);
-  database.del(`client#${req.body["clientId"]}`,
-  (err, result) => {
+.get(function (req, res) {
+  database.keys("client#*", (err, result) => {
     if (result) {
       res.json({
         status: 200,
         message: "success",
-        response: {},
+        response: result,
       });
     } else {
       res.json({
-        status: 402,
-        message: "Error during the delete",
+        status: 404,
+        message: "Error, file not found",
         response: {},
       });
     }
   });
-});
+})
 
-router.route("/clients")
-  .get(function (req, res) {
-    //res.send(`Hello from GET clients`)
-    res.json({
-      status: 200,
-      message: "Hello from GET all clients",
-    });
-  })
-  .post(function (req, res) {
-    //res.send(`Hello from POST clients`)
-    res.json({
-      status: 200,
-      message: "Hello from POST all clients",
-    });
-  })
-  .put(function (req, res) {
-    // res.send(`Hello from PUT clients`)
-    res.json({
-      status: 200,
-      message: "Hello from PUT all clients",
-    });
-  })
-  .delete(function (req, res) {
-    // res.send(`Hello from DELETE clients`)
-    res.json({
-      status: 200,
-      message: "Hello from DELETE all clients",
-    });
-  });
+
 
 module.exports = router;
