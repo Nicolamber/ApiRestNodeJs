@@ -29,10 +29,10 @@ router.route("/clients/:clientId/contracts/:contractId")
     });
   })
 
-  /*.put(function (req, res) {
+  put(function (req, res) {
     body = JSON.stringify(req.body);
     database.hmset(
-      `contract#${req.body["contractId"]}`,
+      `client#${req.params.clientId}contract#${req.params.contractId}`,
       req.body,
       (err, result) => {
         if (result) {
@@ -50,7 +50,7 @@ router.route("/clients/:clientId/contracts/:contractId")
         }
       }
     );
-  })*/
+  })
 
   .delete(function (req, res) {
     body = JSON.stringify(req.body);
@@ -134,10 +134,10 @@ router.route("/clients/:clientId")
   });
 })
 
-/*.put(function (req, res) {
+.put(function (req, res) {
   body = JSON.stringify(req.body);
   database.hmset(
-    `client#${req.body["clientId"]}`,
+    `client#${req.params.clientId}`,
     req.body,
     (err, result) => {
       if (result) {
@@ -155,7 +155,7 @@ router.route("/clients/:clientId")
       }
     }
   );
-})*/
+})
 
 .delete(function (req, res) {
   body = JSON.stringify(req.body);
